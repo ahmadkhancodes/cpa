@@ -72,6 +72,7 @@ const styles = {
 
 function CPAForm() {
     const [formData, setFormData] = useState({
+        trackdrive_number: '',
       caller_id: '',
       lead_token: '',
       submit_date: '',
@@ -90,34 +91,29 @@ function CPAForm() {
         [e.target.name]: e.target.value
       });
     };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-  
-      try {
-        const response = await fetch(
-          'https://global-digital-media.trackdrive.com/posting_instructions/InboundWebhook/0beb1761-61e4-47c9-b040-9a47c7526f79/?traffic_source_id=2195&trackdrive_number_id=22726186',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-          }
-        );
-        console.log(response)
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-  
-        const data = await response.json();
-        console.log('API response:', data);
-        alert('Form submitted successfully!');
-      } catch (error) {
-        console.error('Error submitting the form:', error);
-        alert('There was an error submitting the form.');
-      }
-    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+      
+        // Construct the query string using formData
+        const queryParams = new URLSearchParams({
+          trackdrive_number: formData.trackdrive_number,
+          caller_id: formData.caller_id,
+          lead_token: formData.lead_token,
+          submit_date: formData.submit_date,
+          source_url: formData.source_url,
+          traffic_source_id: formData.traffic_source_id,
+          jornaya_leadid: formData.jornaya_leadid,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          state: formData.state,
+          zip: formData.zip,
+        });
+      
+        // Redirect the browser to the new URL
+        const url = `https://global-digital-media.trackdrive.com/api/v1/inbound_webhooks/ping/check_for_medicare_inbound_buyer_availability?${queryParams}`;
+        window.location.href = url;
+      };
   
     return (
       <div style={styles.formContainer}>
@@ -134,6 +130,17 @@ function CPAForm() {
                 value={formData.caller_id}
                 onChange={handleChange}
                 placeholder="caller_id"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>trackdrive_number</label>
+              <input
+                style={styles.input}
+                type="text"
+                name="trackdrive_number"
+                value={formData.trackdrive_number}
+                onChange={handleChange}
+                placeholder="trackdrive_number"
               />
             </div>
   
